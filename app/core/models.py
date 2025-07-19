@@ -57,6 +57,18 @@ class Movie(models.Model):
     description = models.CharField(max_length=255)
     is_active = models.BooleanField(default=False)
     released_date = models.DateField()
+    rating = models.ManyToManyField('Rating')
 
     def __str__(self):
         return self.title
+
+class Rating(models.Model):
+    """Rating model"""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE)
+    rating = models.FloatField(max_length=5)
+    description = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.description

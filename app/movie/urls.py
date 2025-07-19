@@ -13,6 +13,7 @@ from movie import views
 
 router = DefaultRouter()
 router.register('movies', views.MovieViewSet, 'movie')
+router.register('ratings', views.RatingViewSet, 'rating')
 
 app_name = 'movie'
 
