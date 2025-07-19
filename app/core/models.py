@@ -4,8 +4,8 @@ from django.contrib.auth.models import (
     BaseUserManager,
     PermissionsMixin,
 )
-
 from django.conf import settings
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class UserManager(BaseUserManager):
     """Manages user in the system"""
@@ -57,7 +57,7 @@ class Movie(models.Model):
     description = models.CharField(max_length=255)
     is_active = models.BooleanField(default=False)
     released_date = models.DateField()
-    rating = models.ManyToManyField('Rating')
+    ratings = models.ManyToManyField('Rating')
 
     def __str__(self):
         return self.title
@@ -67,7 +67,7 @@ class Rating(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE)
-    rating = models.FloatField(max_length=5)
+    rating = models.FloatField(validators=[MinValueValidator(0.0), MaxValueValidator(5.0)])
     description = models.CharField(max_length=255)
 
     def __str__(self):

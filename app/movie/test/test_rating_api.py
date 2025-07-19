@@ -20,7 +20,7 @@ RATING_URL = reverse('movie:rating-list')
 
 def detail_url(rating_id):
     """Get detail url"""
-    return reverse('movie:rating-list', args=[rating_id])
+    return reverse('movie:rating-detail', args=[rating_id])
 
 def create_user(is_super=False,**params):
     """Create and return user"""
@@ -75,5 +75,45 @@ class PrivateApiTest(TestCase):
                               description='Test desc')
 
         res = self.client.get(RATING_URL)
+
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 2)
+
+    def test_update_rating(self):
+        """Test updating rating"""
+        rating = Rating.objects.create(user=self.user,
+                                       rating=1.2,
+                                       description='description')
+        payload = {'rating':1.3}
+        url = detail_url(rating.id)
+
+        res = self.client.patch(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        rating.refresh_from_db()
+        self.assertEqual(rating.rating, payload['rating'])
+
+    def test_delete_rating_successful(self):
+        """Test deleting rating"""
+        rating = Rating.objects.create(user=self.user,
+                                       rating=1.2,
+                                       description='description')
+
+        url = detail_url(rating.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        ratings = Rating.objects.all().filter(user=self.user)
+        self.assertEqual(len(ratings), 0)
+
+    def test_delete_rating_unsuccessful(self):
+        """Test deleting someone's rating is not allowed"""
+        user = create_user(email='user3@example.com', username='user3')
+        rating = Rating.objects.create(user=user,
+                                       rating=1.2,
+                                       description='description')
+        url = detail_url(rating.id)
+        res = self.client.delete(url)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        ratings = Rating.objects.all().filter(user=user)
+        self.assertEqual(len(ratings), 1)
