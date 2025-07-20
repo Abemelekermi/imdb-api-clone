@@ -19,7 +19,7 @@ from movie.permissions import IsOwnerOrReadOnly
 
 class MovieViewSet(viewsets.ModelViewSet):
     """View for managing Movie in the databse"""
-    serializer_class = serializers.MovieSerializer
+    serializer_class = serializers.MovieDetailSerializer
     authentication_classes = [TokenAuthentication]
     queryset = Movie.objects.all()
     http_method_names = [
@@ -36,6 +36,27 @@ class MovieViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Assign the authenticated user to the movie instance."""
         serializer.save(user=self.request.user)
+
+    def get_serializer_class(self):
+        """Return the serializer class for request"""
+        if self.action == 'list':
+            return serializers.MovieSerializer
+        elif self.action == 'upload_image':
+            return serializers.MovieDetailSerializer
+
+        return self.serializer_class
+
+    @action(methods=['POST'], detail=True, url_path='upload-image')
+    def upload_image(self, request, pk=None):
+        """Upload an image to Movie"""
+        movie = self.get_object()
+        serializer = self.get_serializer(movie, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RatingViewSet(mixins.CreateModelMixin,
                     mixins.DestroyModelMixin,

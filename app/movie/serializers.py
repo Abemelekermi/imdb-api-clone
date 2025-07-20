@@ -22,7 +22,7 @@ class MovieSerializer(serializers.ModelSerializer):
     ratings = RatingSerializer(many=True, required=False)
     class Meta:
         model = Movie
-        fields = ['id', 'title', 'description', 'is_active', 'released_date', 'ratings']
+        fields = ['id', 'title', 'is_active', 'released_date', 'ratings']
         read_only_fields = ['id']
     def create(self, validated_data):
         ratings_data = validated_data.pop('ratings', [])
@@ -33,3 +33,18 @@ class MovieSerializer(serializers.ModelSerializer):
             movie.ratings.add(rating)
 
         return movie
+
+
+class MovieDetailSerializer(MovieSerializer):
+    """Serializer for movie detail view"""
+    class Meta(MovieSerializer.Meta):
+        fields = MovieSerializer.Meta.fields + ['description', 'image']
+
+class MovieImageSerializer(serializers.ModelSerializer):
+    """Serializers for uploading image to the movies"""
+
+    class Meta:
+        model = Movie
+        fields = ['id', 'image']
+        read_only_fields = ['id']
+        extra_kwargs = {'image':{'required': 'True'}}

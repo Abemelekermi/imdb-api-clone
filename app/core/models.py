@@ -7,6 +7,15 @@ from django.contrib.auth.models import (
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+import os
+import uuid
+def movie_image_file_path(instance, filename):
+    """Generate file path for the movie image"""
+    ext = os.path.split(filename)[1]
+    filename = f'{uuid.uuid4()}{ext}'
+
+    return os.path.join('uploads', 'movie', filename)
+
 class UserManager(BaseUserManager):
     """Manages user in the system"""
     def create_user(self, username, email, password=None, **extra_fields):
@@ -58,7 +67,7 @@ class Movie(models.Model):
     is_active = models.BooleanField(default=False)
     released_date = models.DateField()
     ratings = models.ManyToManyField('Rating')
-
+    image = models.ImageField(null=True, upload_to=movie_image_file_path)
     def __str__(self):
         return self.title
 
