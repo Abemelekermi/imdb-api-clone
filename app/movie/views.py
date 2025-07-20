@@ -42,7 +42,7 @@ class MovieViewSet(viewsets.ModelViewSet):
         if self.action == 'list':
             return serializers.MovieSerializer
         elif self.action == 'upload_image':
-            return serializers.MovieDetailSerializer
+            return serializers.MovieImageSerializer
 
         return self.serializer_class
 

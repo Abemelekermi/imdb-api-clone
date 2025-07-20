@@ -24,9 +24,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/movie/', include('movie.urls')),
     path('api/user/', include('user.urls')),
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/schema/', SpectacularAPIView.as_view(), name='api-schema'),# Generates the yaml file for the API schema
+    path('api/docs/',
+         SpectacularSwaggerView.as_view(url_name='api-schema'),
+         name='api-docs'),
      # Optional UI:
-    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
 ]

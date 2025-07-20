@@ -24,6 +24,7 @@ class MovieSerializer(serializers.ModelSerializer):
         model = Movie
         fields = ['id', 'title', 'is_active', 'released_date', 'ratings']
         read_only_fields = ['id']
+
     def create(self, validated_data):
         ratings_data = validated_data.pop('ratings', [])
         movie = Movie.objects.create(**validated_data)
@@ -47,4 +48,4 @@ class MovieImageSerializer(serializers.ModelSerializer):
         model = Movie
         fields = ['id', 'image']
         read_only_fields = ['id']
-        extra_kwargs = {'image':{'required': 'True'}}
+        extra_kwargs = {'image': {'required': 'True'}}
